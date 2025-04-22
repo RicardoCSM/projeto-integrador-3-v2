@@ -1,4 +1,4 @@
-import { withAuth } from "@/utils/middleware";
+import { withAuth } from "~/lib/middleware";
 
 const mockData = {
   secretMessage: "This is protected data!",

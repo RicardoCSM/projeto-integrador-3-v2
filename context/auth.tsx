@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as WebBrowser from "expo-web-browser";
-import { AuthUser } from "@/utils/middleware";
+import { AuthUser } from "~/lib/middleware";
 import {
   AuthError,
   AuthRequestConfig,
@@ -8,9 +8,9 @@ import {
   makeRedirectUri,
   useAuthRequest,
 } from "expo-auth-session";
-import { tokenCache } from "@/utils/cache";
+import { tokenCache } from "~/lib/cache";
 import { Platform } from "react-native";
-import { BASE_URL } from "@/utils/constants";
+import { BASE_URL } from "~/lib/constants";
 import * as jose from "jose";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -27,7 +27,12 @@ const AuthContext = React.createContext({
 
 const config: AuthRequestConfig = {
   clientId: "google",
-  scopes: ["openid", "profile", "email"],
+  scopes: [
+    "openid",
+    "profile",
+    "email",
+    "https://www.googleapis.com/auth/spreadsheets",
+  ],
   redirectUri: makeRedirectUri(),
 };
 
@@ -156,7 +161,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ platform: "web" }),
+          body: JSON.stringify({
+            platform: "web",
+          }),
           credentials: "include",
         });
 

@@ -3,7 +3,7 @@ import {
   BASE_URL,
   APP_SCHEME,
   GOOGLE_AUTH_URL,
-} from "@/utils/constants";
+} from "~/lib/constants";
 
 export async function GET(request: Request) {
   if (!GOOGLE_CLIENT_ID) {
@@ -48,7 +48,8 @@ export async function GET(request: Request) {
     response_type: "code",
     scope: url.searchParams.get("scope") || "identity",
     state: state,
-    prompt: "select_account",
+    access_type: "offline",
+    prompt: "consent",
   });
 
   return Response.redirect(GOOGLE_AUTH_URL + "?" + params.toString());

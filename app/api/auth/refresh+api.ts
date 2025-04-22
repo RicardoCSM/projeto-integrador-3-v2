@@ -1,5 +1,7 @@
 import * as jose from "jose";
 import {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
   COOKIE_NAME,
   REFRESH_COOKIE_NAME,
   COOKIE_MAX_AGE,
@@ -8,7 +10,7 @@ import {
   COOKIE_OPTIONS,
   REFRESH_TOKEN_EXPIRY,
   REFRESH_COOKIE_OPTIONS,
-} from "@/utils/constants";
+} from "~/lib/constants";
 
 export async function POST(request: Request) {
   try {
@@ -80,6 +82,36 @@ export async function POST(request: Request) {
           const userInfo = decoded.payload;
 
           const issuedAt = Math.floor(Date.now() / 1000);
+
+          const googleRefreshToken = userInfo.google_refresh_token;
+
+          if (typeof googleRefreshToken === "string" && googleRefreshToken) {
+            const response = await fetch(
+              "https://oauth2.googleapis.com/token",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                  client_id: GOOGLE_CLIENT_ID,
+                  client_secret: GOOGLE_CLIENT_SECRET,
+                  grant_type: "refresh_token",
+                  refresh_token: googleRefreshToken,
+                }),
+              }
+            );
+
+            const data = await response.json();
+
+            userInfo.google_access_token = data.access_token;
+            userInfo.google_refresh_token = data.refresh_token;
+          } else {
+            return Response.json(
+              { error: "Missing refresh token" },
+              { status: 401 }
+            );
+          }
 
           const newAccessToken = await new jose.SignJWT({ ...userInfo })
             .setProtectedHeader({ alg: "HS256" })
@@ -185,6 +217,30 @@ export async function POST(request: Request) {
           userInfo.picture ||
           `https://ui-avatars.com/api/?name=User&background=random`,
       };
+    }
+
+    const googleRefreshToken = userInfo.google_refresh_token;
+
+    if (typeof googleRefreshToken === "string" && googleRefreshToken) {
+      const response = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          client_id: GOOGLE_CLIENT_ID,
+          client_secret: GOOGLE_CLIENT_SECRET,
+          grant_type: "refresh_token",
+          refresh_token: googleRefreshToken,
+        }),
+      });
+
+      const data = await response.json();
+
+      completeUserInfo.google_access_token = data.access_token;
+      completeUserInfo.google_refresh_token = data.refresh_token;
+    } else {
+      return Response.json({ error: "Missing refresh token" }, { status: 401 });
     }
 
     const newAccessToken = await new jose.SignJWT({

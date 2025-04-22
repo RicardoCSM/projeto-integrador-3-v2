@@ -11,7 +11,7 @@ import {
   COOKIE_OPTIONS,
   REFRESH_TOKEN_EXPIRY,
   REFRESH_COOKIE_OPTIONS,
-} from "@/utils/constants";
+} from "~/lib/constants";
 
 export async function POST(request: Request) {
   const body = await request.formData();
@@ -39,24 +39,28 @@ export async function POST(request: Request) {
 
   const data = await response.json();
 
-  if (!data.id_token) {
+  if (!data.id_token || !data.access_token) {
     return Response.json(
       { error: "Missing required parameters" },
       { status: 400 }
     );
   }
 
-  const userInfo = jose.decodeJwt(data.id_token) as object;
+  const userInfo = jose.decodeJwt(data.id_token) as any;
 
-  const { exp, ...userInfoWithoutExp } = userInfo as any;
-
-  const sub = (userInfo as { sub: string }).sub;
-
+  const sub = userInfo.sub;
   const issuedAt = Math.floor(Date.now() / 1000);
-
   const jti = crypto.randomUUID();
 
-  const accessToken = await new jose.SignJWT(userInfoWithoutExp)
+  const payloadBase = {
+    ...userInfo,
+    google_access_token: data.access_token,
+    google_refresh_token: data.refresh_token,
+  };
+
+  delete payloadBase.exp;
+
+  const accessToken = await new jose.SignJWT(payloadBase)
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime(JWT_EXPIRATION_TIME)
     .setSubject(sub)
@@ -73,6 +77,8 @@ export async function POST(request: Request) {
     given_name: (userInfo as any).given_name,
     family_name: (userInfo as any).family_name,
     email_verified: (userInfo as any).email_verified,
+    google_access_token: data.access_token,
+    google_refresh_token: data.refresh_token,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime(REFRESH_TOKEN_EXPIRY)

@@ -42,6 +42,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "Para a leitura do QR Code, precisamos acessar a câmera do seu dispositivo."
+        }
+      ],
       "expo-secure-store"
     ],
     "experiments": {
