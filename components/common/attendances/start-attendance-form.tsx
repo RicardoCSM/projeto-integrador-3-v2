@@ -4,7 +4,7 @@ import { useAttendances } from "~/store/useAttendances";
 import { Calendar, toDateId } from "@marceloterreiro/flash-calendar";
 import { ChevronRight } from "~/lib/icons/ChevronRight";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
-import { format, subMonths, addMonths } from "date-fns";
+import { format, subMonths, addMonths, addDays } from "date-fns";
 import { Button } from "~/components/ui/button";
 import { AttendanceDate } from "~/types/attendance-date";
 import { useColorScheme } from "~/lib/useColorScheme";
@@ -33,18 +33,17 @@ export default function StartAttendanceForm({
       )
     ),
     defaultValues: {
-      attendanceDate: "",
+      attendanceDate: format(today, "yyyy-MM-dd"),
     },
   });
 
   function onSubmit(values: StartAttendanceRecord) {
-    console.log("values", values);
     if (!values.attendanceDate) return;
+    const selectedDate = addDays(values.attendanceDate, 1);
     const selectedAttendanceDate = attendanceDates.find(
       (attendanceDate) =>
-        attendanceDate.date === format(values.attendanceDate, "dd/MM/yyyy")
+        attendanceDate.date === format(selectedDate, "dd/MM/yyyy")
     );
-    console.log("selectedAttendanceDate", selectedAttendanceDate);
     if (!selectedAttendanceDate) return;
     setSelectedAttendanceDate(selectedAttendanceDate);
     router.push("/attendance-scanner");

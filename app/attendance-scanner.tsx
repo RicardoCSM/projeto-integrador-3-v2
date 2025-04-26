@@ -2,15 +2,12 @@ import { Text } from "~/components/ui/text";
 import { useAttendances } from "~/store/useAttendances";
 import { Button } from "~/components/ui/button";
 import { router, Stack } from "expo-router";
-import AttendanceScanner from "~/components/common/attendances/attendance-scanner";
-import { useState } from "react";
+import { Platform } from "react-native";
+import { default as AttendanceScanner } from "~/components/common/attendances/attendance-scanner";
 
 export default function AttendanceScannerPage() {
   const { selectedAttendanceDate, setSelectedAttendanceDate } =
     useAttendances();
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
-    useState(false);
-  const [currentReadedId, setCurrentReadedId] = useState("");
 
   return (
     <>
@@ -36,7 +33,13 @@ export default function AttendanceScannerPage() {
           ),
         }}
       />
-      <AttendanceScanner />
+      {Platform.OS === "web" ? (
+        <Text className="text-center text-lg font-bold">
+          O scanner de QR Code não está disponível no navegador.
+        </Text>
+      ) : (
+        <AttendanceScanner />
+      )}
     </>
   );
 }
