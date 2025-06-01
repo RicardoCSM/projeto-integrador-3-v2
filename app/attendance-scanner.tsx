@@ -29,10 +29,10 @@ export default function AttendanceScannerPage() {
                 setSelectedAttendanceDate(null);
                 router.push("/(tabs)/attendance");
               }}
-              className="bg-white text-black"
+              className="bg-white"
               size="sm"
             >
-              <Text>Encerrar</Text>
+              <Text className="text-black">Encerrar</Text>
             </Button>
           ),
           headerRight: () => <></>,
