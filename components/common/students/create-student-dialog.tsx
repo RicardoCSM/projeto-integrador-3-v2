@@ -25,8 +25,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle } from "~/lib/icons/PlusCircle";
 import { Form, FormField, FormInput } from "~/components/ui/form";
 import { useState } from "react";
+import { Class } from "~/types/class";
 
-export default function CreateStudentDialog() {
+export default function CreateStudentDialog({
+  classItem,
+}: {
+  classItem: Class;
+}) {
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { students } = useStudents();
@@ -47,7 +52,7 @@ export default function CreateStudentDialog() {
         (acc, student) => Math.max(acc, student.position),
         0
       );
-      const range = `Turma1!B${maxPosition + 1}:D${maxPosition + 1}`;
+      const range = `${classItem.name}!B${maxPosition + 1}:D${maxPosition + 1}`;
       await insertStudent(
         user?.google_access_token || "",
         range,
@@ -73,14 +78,10 @@ export default function CreateStudentDialog() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="bg-eeaa ">
           <View className="flex flex-row items-center">
-            <PlusCircle
-              height={16}
-              width={16}
-              className="mr-2 text-primary-foreground"
-            />
-            <Text>Inserir novo estudante</Text>
+            <PlusCircle height={16} width={16} className="mr-2 text-white" />
+            <Text className="text-white">Inserir novo estudante</Text>
           </View>
         </Button>
       </DialogTrigger>
@@ -137,6 +138,7 @@ export default function CreateStudentDialog() {
             </Button>
           </DialogClose>
           <Button
+            className="bg-eeaa"
             disabled={status === "pending"}
             onPress={form.handleSubmit(onSubmit)}
           >
@@ -144,7 +146,7 @@ export default function CreateStudentDialog() {
               {status === "pending" && (
                 <LoaderCircle className="mr-2 animate-spin text-destructive-foreground" />
               )}
-              <Text>Inserir</Text>
+              <Text className="text-white">Inserir</Text>
             </View>
           </Button>
         </DialogFooter>

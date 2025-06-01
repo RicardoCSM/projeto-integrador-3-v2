@@ -24,7 +24,7 @@ export default function DeleteStudentDialog({ student }: { student: Student }) {
   const { removeStudent } = useStudents();
   const { mutateAsync, status } = useMutation({
     mutationFn: async () => {
-      const range = `Turma1!${student.position}:${student.position}`;
+      const range = `${student.class?.name}!${student.position}:${student.position}`;
       await deleteStudent(user?.google_access_token || "", range);
     },
     onSuccess: () => {

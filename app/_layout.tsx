@@ -17,6 +17,7 @@ import { Text } from "~/components/ui/text";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -56,29 +57,31 @@ export default function RootLayout() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-            <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-            <Stack
-              initialRouteName="(tabs)"
-              screenOptions={{
-                headerBackTitle: "Back",
-                headerTitle(props) {
-                  return (
-                    <Text className="text-xl font-semibold">
-                      {toOptions(props.children)}
-                    </Text>
-                  );
-                },
-                headerRight: () => <ThemeToggle />,
-              }}
-            >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-          </ThemeProvider>
-        </AuthProvider>
-        <PortalHost />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AuthProvider>
+            <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+              <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+              <Stack
+                initialRouteName="(tabs)"
+                screenOptions={{
+                  headerBackTitle: "Back",
+                  headerTitle(props) {
+                    return (
+                      <Text className="text-xl font-semibold">
+                        {toOptions(props.children)}
+                      </Text>
+                    );
+                  },
+                  headerRight: () => <ThemeToggle />,
+                }}
+              >
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+            </ThemeProvider>
+          </AuthProvider>
+          <PortalHost />
+        </GestureHandlerRootView>
       </QueryClientProvider>
     </>
   );

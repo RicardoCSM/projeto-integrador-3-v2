@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { View } from "react-native";
-import { insertStudent, updateStudent } from "~/actions/students";
+import { updateStudent } from "~/actions/students";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { useAuth } from "~/context/auth";
@@ -41,7 +41,7 @@ export default function EditStudentDialog({ student }: { student: Student }) {
 
   const { mutateAsync, status } = useMutation({
     mutationFn: async (studentSchema: EditStudentSchema) => {
-      const range = `Turma1!C${student.position}:D${student.position}`;
+      const range = `${student.class?.name}!C${student.position}:D${student.position}`;
       await updateStudent(
         user?.google_access_token || "",
         range,
@@ -74,14 +74,10 @@ export default function EditStudentDialog({ student }: { student: Student }) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" className="bg-eeaa">
           <View className="flex flex-row items-center">
-            <Pencil
-              height={16}
-              width={16}
-              className="mr-2 text-primary-foreground"
-            />
-            <Text>Editar</Text>
+            <Pencil height={16} width={16} className="mr-2 text-white" />
+            <Text className="text-white">Editar</Text>
           </View>
         </Button>
       </DialogTrigger>
@@ -131,6 +127,7 @@ export default function EditStudentDialog({ student }: { student: Student }) {
             </Button>
           </DialogClose>
           <Button
+            className="bg-eeaa"
             disabled={status === "pending"}
             onPress={form.handleSubmit(onSubmit)}
           >
@@ -138,7 +135,7 @@ export default function EditStudentDialog({ student }: { student: Student }) {
               {status === "pending" && (
                 <LoaderCircle className="mr-2 animate-spin text-destructive-foreground" />
               )}
-              <Text>Atualizar</Text>
+              <Text className="text-white">Atualizar</Text>
             </View>
           </Button>
         </DialogFooter>

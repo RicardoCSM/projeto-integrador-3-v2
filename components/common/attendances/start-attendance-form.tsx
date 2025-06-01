@@ -16,14 +16,21 @@ import {
 } from "~/lib/validations/attendances";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
+import { startAttendanceDateList } from "~/actions/attendances";
+import { useAuth } from "~/context/auth";
+import { Class } from "~/types/class";
 
 export default function StartAttendanceForm({
   attendanceDates,
+  classes,
 }: {
   attendanceDates: AttendanceDate[];
+  classes: Class[];
 }) {
+  const { user } = useAuth();
   const { setSelectedAttendanceDate } = useAttendances();
   const today = toDateId(new Date());
+  const [isLoading, setIsLoading] = useState(false);
   const [currentMonthId, setCurrentMonthId] = useState(today);
   const { isDarkColorScheme } = useColorScheme();
   const form = useForm<StartAttendanceRecord>({
@@ -37,18 +44,32 @@ export default function StartAttendanceForm({
     },
   });
 
-  function onSubmit(values: StartAttendanceRecord) {
-    if (!values.attendanceDate) return;
-    const selectedDate = addDays(values.attendanceDate, 1);
-    const selectedAttendanceDate = attendanceDates.find(
-      (attendanceDate) =>
-        attendanceDate.date === format(selectedDate, "dd/MM/yyyy")
-    );
-    if (!selectedAttendanceDate) return;
-    setSelectedAttendanceDate(selectedAttendanceDate);
-    router.push("/attendance-scanner");
-  }
+  async function onSubmit(values: StartAttendanceRecord) {
+    setIsLoading(true);
+    try {
+      if (!values.attendanceDate) return;
+      const selectedDate = addDays(values.attendanceDate, 1);
+      const selectedAttendanceDate = attendanceDates.find(
+        (attendanceDate) =>
+          attendanceDate.date === format(selectedDate, "dd/MM/yyyy")
+      );
+      if (!selectedAttendanceDate) return;
 
+      if (!selectedAttendanceDate.hasAttendanceList) {
+        await startAttendanceDateList(
+          user?.google_access_token || "",
+          classes,
+          selectedAttendanceDate
+        );
+      }
+
+      setSelectedAttendanceDate(selectedAttendanceDate);
+      router.push("/attendance-scanner");
+    } catch (error) {
+      console.error("Error starting attendance:", error);
+    }
+    setIsLoading(false);
+  }
   return (
     <View className="flex-1 gap-6 py-4 px-2">
       <Text className="text-lg font-bold text-center">
@@ -64,6 +85,7 @@ export default function StartAttendanceForm({
           }
           variant="ghost"
           size="icon"
+          disabled={isLoading}
         >
           <ChevronLeft className="size-4 text-primary" />
         </Button>
@@ -76,6 +98,7 @@ export default function StartAttendanceForm({
           }
           variant="ghost"
           size="icon"
+          disabled={isLoading}
         >
           <ChevronRight className="size-4 text-primary" />
         </Button>
@@ -89,15 +112,21 @@ export default function StartAttendanceForm({
               endId: form.watch("attendanceDate") || today,
             },
           ]}
-          onCalendarDayPress={(date) => form.setValue("attendanceDate", date)}
+          onCalendarDayPress={(date) =>
+            !isLoading && form.setValue("attendanceDate", date)
+          }
           calendarColorScheme={isDarkColorScheme ? "dark" : "light"}
         />
         <Text className="text-sm font-medium text-destructive">
           {form.formState.errors.attendanceDate?.message}
         </Text>
       </View>
-      <Button className="mt-auto" onPress={() => form.handleSubmit(onSubmit)()}>
-        <Text>Confirmar</Text>
+      <Button
+        className="mt-auto bg-eeaa"
+        disabled={isLoading}
+        onPress={() => form.handleSubmit(onSubmit)()}
+      >
+        <Text className="text-white">Confirmar</Text>
       </Button>
     </View>
   );

@@ -8,11 +8,15 @@ import { SafeAreaView, View } from "react-native";
 import { useEffect, useState } from "react";
 import { Text } from "~/components/ui/text";
 import AttendanceConfirmationDialog from "~/components/common/attendances/attendance-confirmation-dialog";
+import { Student } from "~/types/student";
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY = process.env.AUTH_SECRET_KEY || "";
 
 export default function AttendanceScanner() {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
-  const [currentReadedId, setCurrentReadedId] = useState("");
+  const [currentReaded, setCurrentReaded] = useState<Student | null>(null);
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice("front");
 
@@ -27,8 +31,17 @@ export default function AttendanceScanner() {
     onCodeScanned: (codes) => {
       if (codes[0].value) {
         if (!isConfirmationDialogOpen) {
-          setCurrentReadedId(codes[0].value);
-          setIsConfirmationDialogOpen(true);
+          try {
+            const encryptedStudent = CryptoJS.AES.decrypt(
+              codes[0].value,
+              SECRET_KEY
+            ).toString(CryptoJS.enc.Utf8);
+            const studentData = JSON.parse(encryptedStudent) as Student;
+            setCurrentReaded(studentData);
+            setIsConfirmationDialogOpen(true);
+          } catch (error) {
+            console.error("Erro ao decifrar o código QR:", error);
+          }
         }
       }
     },
@@ -52,11 +65,13 @@ export default function AttendanceScanner() {
             style={{ flex: 1 }}
             codeScanner={codeScanner}
           />
-          <AttendanceConfirmationDialog
-            studentId={currentReadedId}
-            open={isConfirmationDialogOpen}
-            setOpen={setIsConfirmationDialogOpen}
-          />
+          {currentReaded && (
+            <AttendanceConfirmationDialog
+              student={currentReaded}
+              open={isConfirmationDialogOpen}
+              setOpen={setIsConfirmationDialogOpen}
+            />
+          )}
         </>
       ) : (
         <View>

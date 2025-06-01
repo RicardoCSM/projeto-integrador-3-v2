@@ -1,4 +1,3 @@
-import { View } from "react-native";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import {
@@ -10,29 +9,35 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { useStudents } from "~/store/useStudents";
 import { useMutation } from "@tanstack/react-query";
 import { confirmStudentAttendance } from "~/actions/attendances";
 import { useAttendances } from "~/store/useAttendances";
 import { useAuth } from "~/context/auth";
+import { Student } from "~/types/student";
 
 export default function AttendanceConfirmationDialog({
-  studentId,
+  student,
   open,
   setOpen,
 }: {
-  studentId: string;
+  student: Student;
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
   const { user } = useAuth();
   const { selectedAttendanceDate } = useAttendances();
-  const { students } = useStudents();
-  const student = students.find((student) => student.id === studentId);
   const { mutateAsync, status } = useMutation({
     mutationFn: async () => {
-      const range = `Turma1!${selectedAttendanceDate?.position}${student?.position}:${selectedAttendanceDate?.position}${student?.position}`;
-      await confirmStudentAttendance(user?.google_access_token || "", range);
+      if (!selectedAttendanceDate || !student) {
+        throw new Error("Selected attendance date or student not found");
+      }
+
+      const range = `${student.class?.name}!${selectedAttendanceDate?.position}${student?.position}:${selectedAttendanceDate?.position}${student?.position}`;
+      await confirmStudentAttendance(
+        selectedAttendanceDate.bim,
+        user?.google_access_token || "",
+        range
+      );
     },
     onSuccess: () => {
       setOpen(false);

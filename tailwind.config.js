@@ -8,6 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        eeaa: 'hsl(143 72% 31%)',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

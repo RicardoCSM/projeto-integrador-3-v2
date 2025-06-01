@@ -7,20 +7,35 @@ import { useAuth } from "~/context/auth";
 import { useAttendances } from "~/store/useAttendances";
 import { Redirect } from "expo-router";
 import StartAttendanceForm from "~/components/common/attendances/start-attendance-form";
-
-const RANGE = "Turma1!E2:BB2";
+import { fetchClasses } from "~/actions/classes";
 
 export default function Attendance() {
   const { user } = useAuth();
   const { attendanceDates, setAttendanceDates, selectedAttendanceDate } =
     useAttendances();
+  const { isPending: isClassesPending, data: classes = [] } = useQuery({
+    queryKey: ["classes"],
+    queryFn: async () => {
+      const classes = await fetchClasses(user?.google_access_token || "");
+
+      return classes;
+    },
+  });
   const { isPending, error } = useQuery({
     queryKey: ["attendance-dates"],
+    enabled: !isClassesPending && classes.length > 0,
     queryFn: async () => {
+      const baseClass = classes[0];
+
+      if (!baseClass) {
+        throw new Error("No classes found");
+      }
+
       const attendanceDates = await fetchAttendanceDates(
         user?.google_access_token || "",
-        RANGE
+        `${baseClass.name}!E2:EE4`
       );
+
       setAttendanceDates(attendanceDates);
 
       return attendanceDates;
@@ -41,7 +56,10 @@ export default function Attendance() {
       {selectedAttendanceDate ? (
         <Redirect href="/attendance-scanner" />
       ) : (
-        <StartAttendanceForm attendanceDates={attendanceDates} />
+        <StartAttendanceForm
+          classes={classes}
+          attendanceDates={attendanceDates}
+        />
       )}
     </>
   );

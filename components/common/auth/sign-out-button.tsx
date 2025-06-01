@@ -18,7 +18,7 @@ export default function SignOutButton() {
             pressed && "opacity-70"
           )}
         >
-          <LogOut className="text-foreground" size={24} strokeWidth={1.25} />
+          <LogOut className="text-white" size={24} strokeWidth={1.25} />
         </View>
       )}
     </Pressable>

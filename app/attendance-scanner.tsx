@@ -13,9 +13,12 @@ export default function AttendanceScannerPage() {
     <>
       <Stack.Screen
         options={{
+          headerStyle: {
+            backgroundColor: "#168a43",
+          },
           headerTitle(props) {
             return (
-              <Text className="text-center text-lg font-bold">
+              <Text className="text-center text-lg font-bold text-white">
                 Chamada de {selectedAttendanceDate?.date}
               </Text>
             );
@@ -26,11 +29,13 @@ export default function AttendanceScannerPage() {
                 setSelectedAttendanceDate(null);
                 router.push("/(tabs)/attendance");
               }}
+              className="bg-white text-black"
               size="sm"
             >
               <Text>Encerrar</Text>
             </Button>
           ),
+          headerRight: () => <></>,
         }}
       />
       {Platform.OS === "web" ? (
