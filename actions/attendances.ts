@@ -3,6 +3,10 @@ import { getGoogleSheetsColumnByIndex } from "~/lib/utils";
 import { AttendanceDate } from "~/types/attendance-date";
 import { Class } from "~/types/class";
 
+/**
+ * Constante SHEET_IDS contém os IDs das planilhas do Google Sheets
+ * para cada bim (bimestre) do curso.
+ */
 const SHEET_IDS = {
   "1": process.env.EXPO_PUBLIC_GOOGLE_SHEET_ID_BIM1,
   "2": process.env.EXPO_PUBLIC_GOOGLE_SHEET_ID_BIM2,
@@ -10,6 +14,14 @@ const SHEET_IDS = {
   "4": process.env.EXPO_PUBLIC_GOOGLE_SHEET_ID_BIM4,
 };
 
+/**
+ * Função fetchAttendanceDates busca as datas de presença para cada bim
+ * a partir das planilhas do Google Sheets.
+ *
+ * @param token - Token de autenticação para acessar as planilhas.
+ * @param range - Intervalo de células a ser consultado nas planilhas.
+ * @returns Uma lista de objetos AttendanceDate contendo as datas e informações de presença.
+ */
 export async function fetchAttendanceDates(
   token: string,
   range: string
@@ -65,6 +77,14 @@ export async function fetchAttendanceDates(
   return results.flat();
 }
 
+/**
+ * Função startAttendanceDateList inicializa a lista de presença para cada turma
+ * em uma data específica, preenchendo as células com "F" (faltou).
+ *
+ * @param token - Token de autenticação para acessar as planilhas.
+ * @param classes - Lista de turmas para as quais a lista de presença será iniciada.
+ * @param attendanceDate - Objeto AttendanceDate contendo a data e informações de presença.
+ */
 export async function startAttendanceDateList(
   token: string,
   classes: Class[],
@@ -104,6 +124,14 @@ export async function startAttendanceDateList(
   );
 }
 
+/**
+ * Função confirmStudentAttendance confirma a presença de um aluno
+ * em uma data específica, preenchendo a célula com "P" (presente).
+ *
+ * @param bim - Bimestre do curso (1, 2, 3 ou 4).
+ * @param token - Token de autenticação para acessar as planilhas.
+ * @param range - Intervalo de células onde a presença será confirmada.
+ */
 export async function confirmStudentAttendance(
   bim: "1" | "2" | "3" | "4",
   token: string,

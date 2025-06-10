@@ -1,6 +1,12 @@
 import axios from "axios";
 import { Class } from "~/types/class";
 
+/**
+ * Função fetchClasses busca as classes disponíveis a partir do Google Sheets.
+ *
+ * @param token - Token de autenticação para acessar as planilhas.
+ * @returns Uma lista de objetos Class contendo o índice e o nome de cada classe.
+ */
 export async function fetchClasses(token: string): Promise<Class[]> {
   try {
     const SHEET_ID = process.env.EXPO_PUBLIC_GOOGLE_SHEET_ID_BIM1;

@@ -1,6 +1,14 @@
 import * as jose from "jose";
 import { COOKIE_NAME, JWT_SECRET } from "~/lib/constants";
 
+/**
+ * @description Essa rota é responsável por verificar a sessão do usuário.
+ * Ela extrai o token de autenticação dos cookies, verifica sua validade e retorna as informações do usuário.
+ * @param request - A requisição HTTP que contém os cookies necessários para a verificação da sessão.
+ * @returns Um objeto JSON com as informações do usuário se a sessão for válida, ou um erro 401 se não estiver autenticado.
+ * @throws Retorna um erro 500 se ocorrer um erro no servidor durante o processo de verificação da sessão.
+ * @throws Retorna um erro 401 se o token de autenticação estiver ausente ou inválido.
+ */
 export async function GET(request: Request) {
   try {
     const cookieHeader = request.headers.get("cookie");

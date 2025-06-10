@@ -56,6 +56,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [response]);
 
   React.useEffect(() => {
+    /*
+     * Restaura a sessão do usuário ao iniciar o aplicativo.
+     * Verifica se o usuário está autenticado no navegador ou no aplicativo nativo.
+     * Se estiver no navegador, tenta obter a sessão do servidor.
+     * Se estiver no aplicativo nativo, tenta obter os tokens armazenados localmente.
+     * Se os tokens estiverem presentes, verifica se o token de acesso é válido.
+     * Se o token de acesso estiver expirado, tenta usar o token de atualização para obter um novo token de acesso.
+     * Se não houver tokens, o usuário é considerado não autenticado.
+     */
     const restoreSession = async () => {
       setIsLoading(true);
       try {
@@ -137,6 +146,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     restoreSession();
   }, [isWeb]);
 
+  /*
+   * Função para atualizar o token de acesso usando o token de atualização.
+   * Se já houver uma atualização em andamento, ignora a solicitação.
+   * Se estiver no navegador, faz uma solicitação para o endpoint de atualização.
+   * Se estiver no aplicativo nativo, usa o token de atualização armazenado localmente.
+   * Atualiza os tokens armazenados e o usuário autenticado após a atualização bem-sucedida.
+   */
   const refreshAccessToken = async (tokenToUse?: string) => {
     if (refreshInProgressRef.current) {
       console.log("Token refresh already in progress, skipping");
@@ -268,6 +284,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /*
+   * Função para lidar com os tokens recebidos após o login.
+   * Atualiza os tokens armazenados e o usuário autenticado.
+   * Se estiver no aplicativo nativo, salva os tokens no cache.
+   * Se estiver no navegador, atualiza a sessão do usuário.
+   */
   const handleNativeTokens = async (tokens: {
     accessToken: string;
     refreshToken: string;
@@ -298,6 +320,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /*
+   * Função para lidar com a resposta de autenticação.
+   * Se a resposta for de sucesso, faz uma solicitação para obter o token de acesso.
+   * Se estiver no navegador, atualiza a sessão do usuário.
+   * Se estiver no aplicativo nativo, salva os tokens no cache.
+   * Se a resposta for de cancelamento ou erro, exibe uma mensagem apropriada.
+   */
   async function handleResponse() {
     if (response?.type === "success") {
       try {
@@ -357,6 +386,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  /*
+   * Função para fazer requisições autenticadas.
+   * Se estiver no navegador, faz uma requisição com credenciais incluídas.
+   * Se estiver no aplicativo nativo, adiciona o token de acesso ao cabeçalho Authorization.
+   * Se a resposta for 401, tenta atualizar o token de acesso e refaz a requisição.
+   */
   const fetchWithAuth = async (url: string, options: RequestInit) => {
     if (isWeb) {
       const response = await fetch(url, {
@@ -407,6 +442,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /*
+   * Função para iniciar o processo de login.
+   * Se não houver solicitação de autenticação, exibe uma mensagem de erro.
+   * Caso contrário, chama promptAsync para iniciar o fluxo de autenticação.
+   */
   const signIn = async () => {
     console.log("signIn");
     try {
@@ -421,6 +461,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  /*
+   * Função para encerrar a sessão do usuário.
+   * Se estiver no navegador, faz uma requisição para o endpoint de logout.
+   * Se estiver no aplicativo nativo, remove os tokens do cache.
+   * Atualiza o estado do usuário e os tokens após o logout.
+   */
   const signOut = async () => {
     if (isWeb) {
       try {
@@ -457,6 +503,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+/*
+ * Hook para acessar o contexto de autenticação.
+ * Lança um erro se usado fora do AuthProvider.
+ */
 export const useAuth = () => {
   const context = React.useContext(AuthContext);
   if (!context) {

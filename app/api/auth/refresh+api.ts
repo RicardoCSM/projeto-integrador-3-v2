@@ -12,6 +12,13 @@ import {
   REFRESH_COOKIE_OPTIONS,
 } from "~/lib/constants";
 
+/*
+ * @description Essa rota é responsável por atualizar o token de acesso do usuário usando um token de atualização.
+ * @param request - A requisição HTTP que contém o token de atualização e outros parâmetros necessários.
+ * @returns Um novo token de acesso e, opcionalmente, um novo token de atualização.
+ * @throws Retorna um erro 401 se o token de atualização estiver ausente ou inválido.
+ * @throws Retorna um erro 500 se ocorrer um erro no servidor durante o processo de atualização do token.
+ */
 export async function POST(request: Request) {
   try {
     let platform = "native";

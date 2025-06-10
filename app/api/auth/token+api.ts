@@ -13,6 +13,16 @@ import {
   REFRESH_COOKIE_OPTIONS,
 } from "~/lib/constants";
 
+/**
+ * @description Essa rota é responsável por trocar o código de autorização do Google por um token de acesso e um token de atualização.
+ * Ela recebe o código de autorização, valida-o e gera os tokens JWT necessários para autenticação do usuário.
+ * @param request - A requisição HTTP que contém o código de autorização e outros parâmetros necessários.
+ * @returns Um objeto JSON com o token de acesso e o token de atualização, ou um erro se a validação falhar.
+ * @throws Retorna um erro 400 se o código de autorização estiver ausente ou inválido.
+ * @throws Retorna um erro 500 se ocorrer um erro no servidor durante o processo de troca de tokens.
+ * @throws Retorna um erro 401 se o token de acesso ou o token de atualização não puderem ser gerados corretamente.
+ * @throws Retorna um erro 400 se houver um erro de validação do OAuth, como parâmetros ausentes ou inválidos.
+ */
 export async function POST(request: Request) {
   const body = await request.formData();
   const code = body.get("code") as string;

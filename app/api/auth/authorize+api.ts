@@ -5,6 +5,13 @@ import {
   GOOGLE_AUTH_URL,
 } from "~/lib/constants";
 
+/**
+ * @description Essa rota é responsável por redirecionar o usuário para a página de autorização do Google.
+ * @param request - A requisição HTTP que contém os parâmetros necessários para a autorização.
+ * @returns Um redirecionamento para a URL de autorização do Google com os parâmetros necessários.
+ * @throws Retorna um erro 500 se a variável de ambiente GOOGLE_CLIENT_ID não estiver definida.
+ * @throws Retorna um erro 400  em caso de parâmetros inválidos, como `redirect_uri` ou `client_id`.
+ */
 export async function GET(request: Request) {
   if (!GOOGLE_CLIENT_ID) {
     return Response.json(

@@ -18,7 +18,7 @@ export default function AttendanceScanner() {
     useState(false);
   const [currentReaded, setCurrentReaded] = useState<Student | null>(null);
   const { hasPermission, requestPermission } = useCameraPermission();
-  const device = useCameraDevice("front");
+  const device = useCameraDevice("back");
 
   useEffect(() => {
     if (!hasPermission) {

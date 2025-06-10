@@ -8,6 +8,11 @@ export interface AttendanceDatesState {
   setSelectedAttendanceDate: (attendanceDate: AttendanceDate | null) => void;
 }
 
+/**
+ * Hook para gerenciar o estado das datas de presença.
+ * Utiliza Zustand para criar um store que armazena as datas de presença e a data de presença selecionada.
+ * @returns Um objeto com as datas de presença, a função para definir as datas e a data de presença selecionada.
+ */
 export const useAttendances = create<AttendanceDatesState>((set) => ({
   attendanceDates: [],
   setAttendanceDates: (attendanceDates) => set({ attendanceDates }),

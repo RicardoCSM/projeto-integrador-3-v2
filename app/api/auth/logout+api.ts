@@ -5,6 +5,13 @@ import {
   REFRESH_COOKIE_OPTIONS,
 } from "~/lib/constants";
 
+/**
+ * @description Essa rota é responsável por fazer o logout do usuário, removendo os cookies de autenticação.
+ * @param request - A requisição HTTP que contém os parâmetros necessários para o logout.
+ * @returns Uma resposta JSON indicando sucesso ou erro.
+ * @throws Retorna um erro 500 se ocorrer um erro no servidor durante o processo de logout.
+ * @throws Retorna um erro 400 se os cookies não puderem ser removidos corretamente.
+ */
 export async function POST(request: Request) {
   try {
     const response = Response.json({ success: true });
